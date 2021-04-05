@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="vh:contentModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+    <description>Content model for owner object</description>
+    <author>Volodymyr Honcharov</author>
+    <version>1.0</version>
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <!-- Import Alfresco System Model Definitions -->
+        <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+    </imports>
+    <namespaces>
+        <namespace uri="http://www.vhoncharov.org/model/content/1.0" prefix="vh"/>
+    </namespaces>
+    <constraints>
+        <constraint name="vh:downloads" type="MINMAX">
+            <parameter name="minValue">
+                <value>0</value>
+            </parameter>
+        </constraint>
+        <constraint name="vh:deviceTypes" type="LIST">
+        <parameter name="allowedValues">
+            <list>
+                <value></value> <!-- Empty for default search -->
+                <value>Android</value>
+                <value>IOS</value>
+                <value>Symbian</value>
+            </list>
+        </parameter>
+        </constraint>
+    </constraints>
+    <types>
+        <type name="vh:document">
+            <title>Base vh document type</title>
+            <parent>cm:content</parent>
+            <properties>
+                <property name="vh:documentId">
+                    <title>Document vh Identification Number</title>
+                    <type>d:text</type>
+                </property>
+            </properties>
+        </type>
+        <type name="vh:application">
+            <title>Application representation</title>
+            <parent>vh:document</parent>
+            <properties>
+                <property name="vh:appVersion">
+                    <type>d:text</type>
+                </property>
+                <property name="vh:appDescription">
+                    <type>d:text</type>
+                </property>
+            </properties>
+            <mandatory-aspects>
+                <aspect>cm:countable</aspect>
+            </mandatory-aspects>
+        </type>
+        <type name="vh:device">
+            <title>Device representation</title>
+            <parent>cm:folder</parent>
+            <properties>
+                <property name="vh:deviceId">
+                    <title>Device Identification Number</title>
+                    <type>d:text</type>
+                </property>
+                <property name="vh:deviceOS">
+                    <type>d:text</type>
+                    <constraints>
+                        <constraint ref="vh:deviceTypes" />
+                    </constraints>
+                </property>
+                <property name="vh:osVersion">
+                    <type>d:text</type>
+                </property>
+            </properties>
+            <associations>
+                <child-association name="vh:applications">
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </source>
+                    <target>
+                        <class>vh:application</class>
+                    </target>
+                    <duplicate>false</duplicate>
+                    <propagateTimestamps>false</propagateTimestamps>
+                </child-association>
+            </associations>
+        </type>
+    </types>
+</model>
