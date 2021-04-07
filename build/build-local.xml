@@ -1,0 +1,462 @@
+<project name="ALFRESCO" basedir="../" >
+
+    <property file="build.${user.name}.properties"/>
+    <property name="alfresco.scripts.dir" value="${webapps.dir}/alfresco/WEB-INF/classes/alfresco"/>
+
+
+    <path id="mlant.classpath">
+        <fileset dir="./lib">
+            <include name="ml-ant-http-1.1.1.jar"/>
+        </fileset>
+    </path>
+
+    <target id="Apply AMPs" name="0.Apply AMPs">
+        <!--<antcall target="1.1 Make Release"/>-->
+
+        <!-- Build AMPs -->
+        <exec taskname="package repo amp" executable="mvn">
+            <arg line="-f ${alfresco.module}/pom.xml clean package -o"/>
+        </exec>
+        <exec taskname="package share amp" executable="mvn">
+            <arg line="-f ${share.module}/pom.xml clean package -o"/>
+        </exec>
+
+        <!-- Import POM's to get build versions -->
+        <!--<xmlproperty file="${alfresco.module}/pom.xml" prefix="repo.pom" />
+        <xmlproperty file="${share.module}/pom.xml" prefix="share.pom" />-->
+
+        <!-- Clean tomcat/webapps directory -->
+        <exec command="rm -rf ${webapps.dir}/alfresco.war"/>
+        <exec command="rm -rf ${webapps.dir}/share.war"/>
+        <exec command="rm -rf ${webapps.dir}/alfresco"/>
+        <exec command="rm -rf ${webapps.dir}/share"/>
+
+        <!-- Copy clean WARs into tomcat/webapps -->
+        <exec command="cp ${alfresco.clear.wars}/alfresco.war ${webapps.dir}"/>
+        <exec command="cp ${alfresco.clear.wars}/share.war ${webapps.dir}"/>
+
+        <!-- Remove old AMPs from Alfresco -->
+        <exec command="rm -rf ${alfresco.amp.old}"/>
+        <exec command="rm -rf ${share.amp.old}"/>
+
+        <!-- Copy new AMPs into Alfresco -->
+        <exec command="cp ${alfresco.target.amp} ${alfresco.amp.dir}"/>
+        <exec command="cp ${share.target.amp} ${share.amp.dir}"/>
+
+        <!--execute script apply_amps-->
+        <exec command="${alfresco.apply_amps.script}"/>
+    </target>
+
+    <!--<target id="release" name="1.1 Make Release">
+        <exec taskname="release amp" executable="mvn">
+            <arg line="-f ${alfresco.module}/pom.xml release:update-versions -DautoVersionSubmodules=true"/>
+        </exec>
+    </target>-->
+
+    <target id="package" name="1.2 Clean/Package" >
+
+        <!--under windows-->
+        <!--<exec executable="${build.executable}" dir="${alfresco.module}">-->
+        <!--<arg value="/c"/>-->
+        <!--<arg line="mvn -c clean package"/>-->
+        <!--</exec>-->
+        <!--<exec executable="${build.executable}" dir="${share.module}">-->
+        <!--<arg value="/c"/>-->
+        <!--<arg line="mvn -c clean package"/>-->
+        <!--</exec>-->
+
+        <!--under linux-->
+        <!--<exec taskname="package amp" executable="mvn">-->
+        <!--<arg line="-f ${eci.module}/pom.xml clean package"/>-->
+        <!--</exec>-->
+        <exec command="find ${alfresco.dir}/WEB-INF/lib -type f -name 'repo-*.jar' -delete"/>
+        <exec taskname="package amp" executable="mvn">
+            <arg line="-f ${alfresco.module}/pom.xml clean package"/>
+        </exec>
+        <exec taskname="package share amp" executable="mvn">
+            <arg line="-f ${share.module}/pom.xml clean package"/>
+        </exec>
+
+        <!--<exec taskname="package share amp" executable="mvn">-->
+        <!--<arg line="-f ${reporting.module}/pom.xml clean package"/>-->
+        <!--</exec>-->
+
+    </target>
+
+    <target id="copy_all" name="2.Copy all files">
+
+        <!--Alfresco module-->
+        <copy todir="${alfresco.dir}/WEB-INF/lib" failonerror="false" overwrite="true">
+            <fileset dir="${alfresco.module}/target/amp/lib">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <copy taskname="copy alfresco files" todir="${alfresco.dir}/WEB-INF/classes"
+              overwrite="true" failonerror="false">
+            <fileset dir="${alfresco.module}/target/amp/config">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <copy taskname="copy java files" todir="${alfresco.dir}/WEB-INF/classes" overwrite="true" failonerror="false">
+            <fileset dir="${alfresco.target.dir}/classes">
+                <include name="**/?*.*"/>
+                <exclude name="META-INF/"/>
+                <exclude name="**/eci-audit.xml"/>
+            </fileset>
+        </copy>
+
+        <!--Share module-->
+        <copy todir="${share.dir}/WEB-INF/lib" failonerror="false" overwrite="true">
+            <fileset dir="${share.module}/target/amp/lib">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <copy taskname="copy share files" todir="${share.dir}/WEB-INF/classes" overwrite="true" failonerror="false">
+            <fileset dir="${share.module}/src/main/amp/config">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <copy taskname="copy java files" todir="${share.dir}/WEB-INF/classes" overwrite="true" failonerror="false">
+            <fileset dir="${share.target.dir}/classes">
+                <include name="**/?*.*"/>
+                <exclude name="META-INF/"/>
+            </fileset>
+        </copy>
+
+        <copy taskname="copy web files" todir="${share.dir}" overwrite="true" failonerror="false">
+            <fileset dir="${share.module}/src/main/amp/web">
+                <include name="**/?*.*"/>
+                <exclude name="**/web.xml"/>
+                <exclude name="**/context.xml"/>
+            </fileset>
+        </copy>
+
+        <!--        <copy taskname="copy share-config-custom.xml"
+                      file="${share.module}/src/main/resources/META-INF/share-config-custom.xml"
+                      todir="${share.web.extension.dir}"
+                      overwrite="true"/>-->
+
+    </target>
+
+    <!--<target id="full-reload" name="0.Full Reload">
+        <antcall target="1.1 Make Release"/>
+        <antcall target="1.2 Clean/Package"/>
+        <antcall target="2.Copy all files"/>
+    </target>-->
+
+
+    <!--**************************************************-->
+    <!--**************************************************-->
+    <!--**************************************************-->
+    <!--Build alfresco amp, copy to amps folder, install  -->
+    <!--**************************************************-->
+    <!--**************************************************-->
+    <!--**************************************************-->
+    <taskdef name="http" classname="org.missinglink.ant.task.http.HttpClientTask">
+        <classpath>
+            <path refid="mlant.classpath"/>
+        </classpath>
+    </taskdef>
+
+    <target name="3.Refresh web scripts">
+
+        <copy taskname="copy repo webscripts"
+              todir="${alfresco.dir}/WEB-INF/classes/alfresco/extension/templates"
+              overwrite="true" failonerror="false">
+            <fileset dir="${alfresco.module}/src/main/amp/config/alfresco/extension/templates">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <http url="http://localhost:8080/alfresco/service/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <!--<http url="http://localhost:8080/share/page/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="http://localhost:8080/share/page/caches/dependency/clear"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+        </http>-->
+
+    </target>
+
+    <target name="3.Refresh QA webscripts">
+
+        <http url="http://192.168.7.60:8081/alfresco/service/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="epromos"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="http://192.168.7.60:8081/share/page/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="epromos"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="http://192.168.7.60:8081/share/page/caches/dependency/clear"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="epromos"/>
+        </http>
+
+    </target>
+
+
+    <target name="3.Refresh Dev webscripts">
+
+        <http url="http://192.168.6.138:8080/alfresco/service/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="epromos"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="http://192.168.6.138:8080/share/page/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="epromos"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="http://localhost:8080/share/page/caches/dependency/clear"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+        </http>
+
+    </target>
+
+    <target name="4. Enable Alfresco Debugger">
+
+        <http url="http://localhost:8080/alfresco/s/api/javascript/debugger"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="visible" value="true"/>
+                <parameter name="submit" value="Enable"/>
+            </query>
+        </http>
+
+        <http url="http://localhost:8080/alfresco/service/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+    </target>
+
+    <target name="4.2 Enable Share Debugger">
+
+        <http url="http://localhost:8080/share/page/api/javascript/debugger"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="visible" value="true"/>
+                <parameter name="submit" value="Enable"/>
+            </query>
+        </http>
+
+        <http url="http://localhost:8080/share/page/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+    </target>
+    <target name="Reload webscripts" depends="copy-webscripts" description="Reload repository webscripts">
+        <http url="${alfresco.URL}/alfresco/service/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="${alfresco.admin.name}" password="${alfresco.admin.pass}"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+        <http url="${alfresco.URL}/share/page/index"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="${alfresco.admin.name}" password="${alfresco.admin.pass}"/>
+            <query>
+                <parameter name="reset" value="on"/>
+            </query>
+        </http>
+
+        <http url="${alfresco.URL}/share/page/caches/dependency/clear"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="${alfresco.admin.name}" password="${alfresco.admin.pass}"/>
+        </http>
+    </target>
+
+    <target name="copy-webscripts">
+        <copy todir="${alfresco.scripts.dir}/extension/templates/webscripts" filtering="true">
+            <fileset
+                    dir="${project.dir}/repo/src/main/amp/config/alfresco/extension/templates/webscripts"/>
+        </copy>
+
+
+        <copy todir="${alfresco.scripts.dir}/module/repo" filtering="true">
+            <fileset
+                    dir="${project.dir}/repo/src/main/amp/config/alfresco/module/repo"/>
+        </copy>
+
+        <copy todir="${webapps.dir}/share/WEB-INF/classes/alfresco" overwrite="true">
+            <fileset dir="${project.dir}/share/src/main/amp/config/alfresco/">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${webapps.dir}/share" overwrite="true">
+            <fileset dir="${project.dir}/share/src/main/amp/web">
+                <include name="**/?*.*"/>
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target id="solrReload" name="5.Solr reindex for R5">
+
+        <delete dir="${server.root.dir}/alf_data/solr4/index/archive/SpacesStore"/>
+        <delete dir="${server.root.dir}/alf_data/solr4/index/workspace/SpacesStore"/>
+        <delete dir="${server.root.dir}/alf_data/solr4/model"/>
+        <delete dir="${server.root.dir}/alf_data/solr4/content"/>
+
+    </target>
+
+    <target name="reload.web" >
+        <copy todir="${webapps.dir}/share" overwrite="true">
+            <fileset dir="${share.module}/src/main/amp/web">
+                <exclude name="**/web.xml"/>
+            </fileset>
+        </copy>
+
+        <http url="http://localhost:8080/share/page/caches/dependency/clear"
+              method="POST"
+              printrequest="false"
+              printrequestheaders="false"
+              printresponse="false"
+              printresponseheaders="false"
+              expected="200"
+              failonunexpected="true">
+            <credentials username="admin" password="admin"/>
+        </http>
+    </target>
+
+</project>

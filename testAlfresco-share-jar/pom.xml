@@ -2,41 +2,95 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>testAlfresco-share-jar</artifactId>
+    <artifactId>share</artifactId>
     <name>Alfresco Share JAR Module</name>
-    <packaging>jar</packaging>
-    <description>Sample Share JAR Module (to be included in the share.war) - part of AIO - SDK 3</description>
+    <packaging>amp</packaging>
+    <version>1.0</version>
+
+    <description>Share Module</description>
 
     <parent>
-        <groupId>com.aimprosoft</groupId>
-        <artifactId>testAlfresco</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.alfresco.maven</groupId>
+        <artifactId>alfresco-sdk-parent</artifactId>
+        <version>2.2.0</version>
     </parent>
-
-    <properties>
-    </properties>
 
     <!-- Following dependencies are needed for compiling Java code in src/main/java;
          <scope>provided</scope> is inherited for each of the following;
          for more info, please refer to alfresco-platform-distribution POM -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- This will import the dependencyManagement for all artifacts in the selected Alfresco version/edition
+                (see http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Importing_Dependencies)
+                NOTE: You still need to define dependencies in your POM, but you can omit version as it's enforced by this dependencyManagement. NOTE: It defaults
+                to the latest version this SDK pom has been tested with, but alfresco version can/should be overridden in your project's pom -->
+            <dependency>
+                <groupId>${alfresco.groupId}</groupId>
+                <artifactId>alfresco-platform-distribution</artifactId>
+                <version>${alfresco.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>${alfresco.groupId}</groupId>
             <artifactId>share</artifactId>
+            <version>${alfresco.version}</version>
             <classifier>classes</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.alfresco.surf</groupId>
+            <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-surf-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
+
     <build>
         <plugins>
+            <!-- Compress JavaScript files and store as *-min.js -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compress-js</id>
+                        <goals>
+                            <goal>compress</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- this is false by default, forces the plugin to generate the git.properties1111 file -->
+                    <!--<generateGitPropertiesFile>true</generateGitPropertiesFile>-->
+
+                    <!-- The path for the properties file to be generated. See Super Pom for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
+                    <!--<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>-->
+                    <generateGitPropertiesFilename>${project.build.directory}/${project.artifactId}/module.properties</generateGitPropertiesFilename>
+
+                    <gitDescribe>
+                        <!--add lightweight tag-->
+                        <tags>true</tags>
+                        <dirty></dirty>
+                    </gitDescribe>
+                </configuration>
             </plugin>
         </plugins>
     </build>
