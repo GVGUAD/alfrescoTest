@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>share</artifactId>
-    <name>Alfresco Share JAR Module</name>
+    <name>testAlfresco Share AMP Module</name>
     <packaging>amp</packaging>
     <version>1.0</version>
 
@@ -14,7 +14,6 @@
         <artifactId>alfresco-sdk-parent</artifactId>
         <version>2.2.0</version>
     </parent>
-
     <!-- Following dependencies are needed for compiling Java code in src/main/java;
          <scope>provided</scope> is inherited for each of the following;
          for more info, please refer to alfresco-platform-distribution POM -->
