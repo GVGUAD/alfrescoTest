@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>VH namespace finder</shortname>
+    <description>search VH document by name</description>
+    <url>/vh?q={keyword}</url>
+    <authentication>user</authentication>
+    <format default="json"/>
+    <family>VH Documents</family>
+</webscript>

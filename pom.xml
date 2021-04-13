@@ -8,7 +8,6 @@
     <description>All-In-One (AIO) project for SDK 3.0</description>
     <packaging>pom</packaging>
 
-
     <parent>
         <groupId>org.alfresco.maven</groupId>
         <artifactId>alfresco-sdk-parent</artifactId>
@@ -132,7 +131,7 @@
         </profile>
     </profiles>
     <modules>
-        <module>testAlfresco-share-jar</module>
-        <module>testAlfresco-platform-jar</module>
+        <module>repo</module>
+        <module>share</module>
     </modules>
 </project>

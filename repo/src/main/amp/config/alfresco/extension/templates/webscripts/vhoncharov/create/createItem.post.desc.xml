@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>VH namespace creater</shortname>
+    <description>VH namespace creater in root or in particular path</description>
+    <url>/vh/{documentName}</url>
+    <authentication>user</authentication>
+    <format default="html">extension</format>
+    <family>VH Documents</family>
+</webscript>

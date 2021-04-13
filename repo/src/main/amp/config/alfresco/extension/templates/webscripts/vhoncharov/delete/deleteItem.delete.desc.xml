@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>VH namespace cleaner</shortname>
+    <description>remove VH documents by name</description>
+    <url>/vh/{noderef}</url>
+    <authentication>user</authentication>
+    <format default="html">extension</format>
+    <family>VH Documents</family>
+</webscript>

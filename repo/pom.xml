@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>repo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Alfresco Repository AMP Module</name>
+    <packaging>amp</packaging>
+    <description>This is a sample Alfresco repository AMP project, depended upon by the alfresco WAR aggregator</description>
+
+    <parent>
+        <groupId>com.aimprosoft</groupId>
+        <artifactId>testAlfresco</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+        <maven.test.port>8080</maven.test.port>
+        <maven.test.username>admin</maven.test.username>
+        <maven.test.password>admin</maven.test.password>
+        <maven.test.email.sales>salesrep1@alfresco.com</maven.test.email.sales>
+        <maven.test.email.support>supportsp1@alfresco.com</maven.test.email.support>
+        <maven.test.testuser>supportsp2</maven.test.testuser>
+        <maven.test.support.username>supportsp1</maven.test.support.username>
+        <maven.test.sales.username>salesrep</maven.test.sales.username>
+        <maven.test.customer.asi.number>1111100111</maven.test.customer.asi.number>
+        <!-- Property overrides are mostly done in parent pom -->
+    </properties>
+
+    <!-- Following dependencies are needed for compiling Java code in src/main/java;
+          <scope>provided</scope> is inherited for each of the following;
+          for more info, please refer to alfresco-platform-distribution POM -->
+    <dependencies>
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco-repository</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.social</groupId>
+                    <artifactId>spring-social-facebook</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.social</groupId>
+                    <artifactId>spring-social-facebook-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco</artifactId>
+            <version>${alfresco.version}</version>
+            <scope>provided</scope>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.orderofthebee.support-tools</groupId>
+            <artifactId>support-tools-repo</artifactId>
+            <version>1.1.0.0</version>
+            <type>amp</type>
+            <classifier>amp</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-remote-api</artifactId>
+            <version>${alfresco.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco-share-services</artifactId>
+            <version>${alfresco.version}</version>
+            <scope>provided</scope>
+            <classifier>classes</classifier>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>2.9.0</version>
+            <scope>test</scope>
+        </dependency>-->
+
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>3.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.14.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>jetty-repacked</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+
+        <!--
+            Brings in the extra Enterprise specific repository classes,
+            if the 'enterprise' profile has been activated, needs to be activated manually. -->
+
+        <!-- If we are running in embedded Tomcat skip unit tests -->
+        <profile>
+            <id>run</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <!--<finalName>${project.artifactId}-${project.version}</finalName>-->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
