@@ -19,8 +19,9 @@
       <property name="resourceBundles">
          <list>
             <value>alfresco.web-extension.messages.share</value>
+            <value>alfresco.web-extension.messages.vhWorkflow</value>
+            <value>alfresco.messages.vhWorkflow</value>
          </list>
       </property>
    </bean>
-
 </beans>

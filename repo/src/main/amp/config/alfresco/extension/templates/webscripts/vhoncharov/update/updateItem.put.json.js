@@ -1,4 +1,4 @@
-<import resource="classpath:/alfresco/extension/templates/webscripts/vhoncharov/ContentModelHelper.js">
+// <import resource="classpath:/alfresco/extension/templates/webscripts/vhoncharov/ContentModelHelper.js">
 
   function main() {
   var noderef = url.templateArgs.noderef;

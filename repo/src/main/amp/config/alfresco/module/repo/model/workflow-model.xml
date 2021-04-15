@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model name="acmew:workflowModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+<model name="vhwf:workflowModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
     <!-- Optional meta-data about the model -->
     <description>Sample Workflow Model</description>
     <author>My Name</author>
@@ -14,13 +14,99 @@
         <import uri="http://www.alfresco.org/model/bpm/1.0" prefix="bpm"/>
     </imports>
 
-    <!-- Custom namespace for your domain -->
     <namespaces>
-        <namespace uri="http://www.acme.org/model/workflow/1.0" prefix="acmew"/>
+        <namespace uri="http://www.vhoncharov.org/model/workflow/1.0" prefix="vhwf"/>
     </namespaces>
-
-    <!-- ===============================================================================================================
-        Constraints, Types, and Aspects go here...
-        -->
+    <types>
+        <type name="vhwf:submitReviewTask">
+            <parent>bpm:startTask</parent>
+            <mandatory-aspects>
+                <aspect>vhwf:thirdPartyReviewable</aspect>
+            </mandatory-aspects>
+        </type>
+        <type name="vhwf:activitiMarketingReview">
+            <parent>vhwf:activitiReviewTask</parent>
+        </type>
+        <type name="vhwf:activitiTechReview">
+            <parent>vhwf:activitiReviewTask</parent>
+        </type>
+        <type name="vhwf:activitiThirdPartyReview">
+            <parent>vhwf:activitiReviewTask</parent>
+        </type>
+        <type name="vhwf:activitiRevise">
+            <parent>bpm:activitiOutcomeTask</parent>
+            <properties>
+                <property name="vhwf:reviseOutcome">
+                    <type>d:text</type>
+                    <default>Abort</default>
+                    <constraints>
+                        <constraint type="LIST">
+                            <parameter name="allowedValues">
+                                <list>
+                                    <value>Re-submit</value>
+                                    <value>Abort</value>
+                                </list>
+                            </parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            </properties>
+            <overrides>
+                <property name="bpm:packageItemActionGroup">
+                    <default>edit_package_item_actions</default>
+                </property>
+                <property name="bpm:outcomePropertyName">
+                    <default>{http://www.vhoncharov.org/model/workflow/1.0}reviseOutcome</default>
+                </property>
+            </overrides>
+        </type>
+        <type name="vhwf:activitiReviewTask">
+            <parent>bpm:activitiOutcomeTask</parent>
+            <properties>
+                <property name="vhwf:approveRejectOutcome">
+                    <type>d:text</type>
+                    <default>Reject</default>
+                    <constraints>
+                        <constraint type="LIST">
+                            <parameter name="allowedValues">
+                                <list>
+                                    <value>Approve</value>
+                                    <value>Reject</value>
+                                </list>
+                            </parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            </properties>
+            <overrides>
+                <property name="bpm:packageItemActionGroup">
+                    <default>read_package_item_actions</default>
+                </property>
+                <property name="bpm:outcomePropertyName">
+                    <default>{http://www.vhoncharov.org/model/workflow/1.0}approveRejectOutcome</default>
+                </property>
+            </overrides>
+        </type>
+        <type name="vhwf:activitiApprovedNotification">
+            <parent>bpm:workflowTask</parent>
+            <overrides>
+                <property name="bpm:packageItemActionGroup">
+                    <default>read_package_item_actions</default>
+                </property>
+            </overrides>
+        </type>
+    </types>
+    <aspects>
+        <aspect name="vhwf:thirdPartyReviewable">
+            <title>Third Party Reviewable</title>
+            <properties>
+                <property name="vhwf:reviewerEmail">
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <multiple>false</multiple>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
 </model>
 
