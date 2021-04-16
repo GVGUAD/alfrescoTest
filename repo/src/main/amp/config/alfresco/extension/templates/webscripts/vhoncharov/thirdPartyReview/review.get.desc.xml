@@ -1,0 +1,9 @@
+<webscript>
+    <shortname>Third Party Review</shortname>
+    <description>Third Party Review and approve an application</description>
+    <url>/vh/review?id={idArgument}&amp;action={transArgument}</url>
+    <format default="html">extension</format>
+    <authentication runas="admin">guest</authentication>
+    <transaction>required</transaction>
+    <family>VH Documents</family>
+</webscript>

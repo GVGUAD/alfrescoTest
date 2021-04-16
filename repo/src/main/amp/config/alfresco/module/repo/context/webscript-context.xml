@@ -20,9 +20,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
     <bean id="webscript.vhoncharov.deleteJava.deleteItem.delete"
-          class="com.aimprosoft.platformsample.DeleteWidget"
+          class="com.aimprosoft.scripts.DeleteWidget"
           parent="webscript">
         <property name="nodeService" ref="NodeService"/>
         <property name="searchService" ref="SearchService"/>
+    </bean>
+    <bean id="webscript.vhoncharov.thirdPartyReview.review.get"
+          class="com.aimprosoft.scripts.GetReview"
+          parent="webscript">
+        <property name="workflowService" ref="WorkflowService"/>
     </bean>
 </beans>
